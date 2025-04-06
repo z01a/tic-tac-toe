@@ -244,6 +244,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _managersPrefabs:
   - {fileID: 591001147338897553, guid: 675a349b2973e4cb0878714d82ffd36b, type: 3}
+  - {fileID: 4513152817273779420, guid: aca74562cc380485385dc530a0ab5cb1, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
