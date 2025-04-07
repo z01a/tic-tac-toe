@@ -1,15 +1,13 @@
-using System;
 using TMPro;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GameMenu : Menu
 {
     [Header("Game Menu")]
-    [SerializeField]
     [Tooltip("Reference to the game board panel")]
-    protected GameObject _gameBoardPanel;
+    [SerializeField]
+    private GameObject _gameBoardPanel;
 
     [Tooltip("Reference to the game board cell prefab")]
     [SerializeField]
@@ -17,41 +15,49 @@ public class GameMenu : Menu
 
     protected Button[,] _buttonGrid;
 
-    protected uint _playerMoveCount = 0;
-
-    [SerializeField]
     [Header("Game Menu Buttons")]
     [Tooltip("Button to go back")]
+    [SerializeField]
     public Button backButton;
 
-    [SerializeField]
     [Header("Game Menu Text")]
     [Tooltip("Info text for the game")]
-    public GameObject infoText;
-
     [SerializeField]
+    public TextMeshProUGUI infoText;
+
     [Tooltip("Text for timer")]
-    public GameObject timerText;
+    [SerializeField]
+    public TextMeshProUGUI timerText;
 
     void Start()
     {
-        GameManager.Instance.OnGameStarted += OnGameStarted;
         GameManager.Instance.OnGameEnded += OnGameEnded;
-        GameManager.Instance.OnPlayerChanged += OnPlayerChanged;
         GameManager.Instance.OnCellPlayed += OnCellPlayed;
-        GameManager.Instance.OnPlayerWon += OnPlayerWon;
         GameManager.Instance.OnGameReset += OnGameReset;
 
         AddButtonOnClickListener(backButton, OnBackButtonClicked);
 
         InitializeBoard();
+    }
 
+    private void OnGameEnded(Player player)
+    {
+        string message = player == Player.Invalid ? "Draw, wanna play more?" : $"{player} WON!, wanna play more?";
+        
+        DialogBox.Instance.Show(message,
+        () =>
+        {
+            GameManager.Instance.Reset();
+        }, () =>
+        {
+            GameManager.Instance.Reset();
+            MenuManager.Instance.NavigateTo<MainMenu>();
+        });
     }
 
     private void OnGameReset()
     {
         _buttonGrid = null;
-        _playerMoveCount = 0;
 
         UnInitializeBoard();
         InitializeBoard();
@@ -59,6 +65,7 @@ public class GameMenu : Menu
 
     private void UnInitializeBoard()
     {
+        // TODO: Not needed could be smarter :D
         UnInstantiateCells();
     }
 
@@ -78,16 +85,9 @@ public class GameMenu : Menu
 
     private void UpdateTimer()
     {
-        if (timerText != null && GameManager.Instance.GameStartTime != DateTime.MinValue)
+        if (timerText != null && GameManager.Instance.HasGameStarted)
         {
-            if (timerText.TryGetComponent<TextMeshProUGUI>(out var text))
-            {
-                text.text = $"{GameManager.Instance.ElapsedTime:ss\\.ff}";
-            }
-            else
-            {
-                Log.Warn("Timer text is not assigned in the inspector.");
-            }
+            timerText.text = $"{GameManager.Instance.ElapsedTime:ss\\.ff}";
         }
         else
         {
@@ -99,27 +99,13 @@ public class GameMenu : Menu
     {
         if (infoText != null)
         {
-            if (infoText.TryGetComponent<TextMeshProUGUI>(out var text))
-            {
-                text.text = $"{_playerMoveCount} moves and player {GameManager.Instance.CurrentPlayer} turn";
-            }
-            else
-            {
-                Log.Warn("Info text is not text mesh pro.");
-            }
+            infoText.text = $"{GameManager.Instance.PlayerMoveCount} moves and player {GameManager.Instance.CurrentPlayer} turn";
         }
         else
         {
             Log.Warn("Info text is not assigned in the inspector.");
         }
     }
-
-    private void OnPlayerWon(Player player)
-    {
-        // TODO: Show popup with the winner
-        Log.Info($"Player {player} won the game");
-    }
-
     private void InitializeBoard()
     {
         InitializeGrid();
@@ -177,22 +163,9 @@ public class GameMenu : Menu
         }
     }
 
-    private void AddButtonOnClickListener(Button button, Action callback)
-    {
-        if (button != null)
-        {
-            button.onClick.AddListener(() => callback());
-        }
-        else
-        {
-            Log.Warn($"Button {button.name} is not assigned in the inspector.");
-        }
-    }
-
     private void OnCellPlayed(int x, int y, Player player)
     {
         Log.Info($"Cell played at ({x}, {y})");
-        _playerMoveCount++;
         
         if (_buttonGrid[x, y] != null)
         {
@@ -209,27 +182,6 @@ public class GameMenu : Menu
         {
             Log.Warn($"Button at ({x}, {y}) is not assigned in the grid.");
         }
-    }
-
-    private void OnPlayerChanged(Player player)
-    {
-        // TODO: Maybe show some icon who is playing?
-        Log.Info($"Player changed to {player}");
-        // throw new NotImplementedException();
-    }
-
-    private void OnGameEnded()
-    {
-        Log.Info("Game ended");
-        GameManager.Instance.Reset();
-        // throw new NotImplementedException();
-    }
-
-    private void OnGameStarted()
-    {
-        // TODO: We need to start timer here!
-        Log.Info("Game started");
-        // throw new NotImplementedException();
     }
 
     private void OnBackButtonClicked()

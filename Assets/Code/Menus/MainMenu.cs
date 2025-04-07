@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class MainMenu : Menu
@@ -30,25 +28,20 @@ public class MainMenu : Menu
         AddButtonOnClickListener(exitButton, OnExitButtonClicked);
     }
 
-    private void AddButtonOnClickListener(Button button, Action callback)
-    {
-        if (button != null)
-        {
-            button.onClick.AddListener(() => callback());
-        }
-        else
-        {
-            Log.Warn($"Button {button.name} is not assigned in the inspector.");
-        }
-    }
-
     private void OnPlayButtonClicked()
     {
-        MenuManager.Instance.NavigateTo<GameMenu>();
+        DialogBox.Instance.Show("Do you want to play first as X?", 
+            () => {
+                GameManager.Instance.StartingPlayer = Player.X;
+                MenuManager.Instance.NavigateTo<GameMenu>();
+            }, 
+            () => {
+                GameManager.Instance.StartingPlayer = Player.O;
+                MenuManager.Instance.NavigateTo<GameMenu>();
+            });
     }
     private void OnStatsButtonClicked()
     {
-
         MenuManager.Instance.NavigateTo<StatsMenu>();
     }
     private void OnSettingsButtonClicked()
@@ -57,10 +50,14 @@ public class MainMenu : Menu
     }
     private void OnExitButtonClicked()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
+        DialogBox.Instance.Show("Are you sure you want to exit?", 
+            () => {
+    #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+    #else
+            Application.Quit();
+    #endif
+            }, 
+            () => {});
     }
 }

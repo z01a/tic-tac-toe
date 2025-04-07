@@ -12,14 +12,12 @@ class GameManager : Singleton<GameManager>
 {
     [Header("Game Manager")]
     [SerializeField]
-    private Player _startingPlayer = Player.X;
+    public Player StartingPlayer { get; set; } = Player.X;
 
     public Action<int, int, Player> OnCellPlayed;
-    public Action OnGameStarted;
     public Action OnGameReset;
-    public Action OnGameEnded;
-    public Action<Player> OnPlayerChanged;
-    public Action<Player> OnPlayerWon;
+    public Action<Player> OnGameEnded;
+    public Action OnGameDraw;
     public Color PlayerXColor { get; private set; } = Color.red;
 
     public Color PlayerOColor { get; private set; } = Color.blue;
@@ -29,18 +27,17 @@ class GameManager : Singleton<GameManager>
 
     private Board _board;
 
-    private bool _hasGameStarted = false;
+    public uint PlayerMoveCount { get; private set; } = 0;
 
-    private float _elapsedTIme = 0f;
-    private DateTime _gameStartTime;
-    public DateTime GameStartTime => _gameStartTime;
-    private DateTime _gameEndTime;
+    public bool HasGameStarted { get; private set; } = false;
 
-    public TimeSpan ElapsedTime => DateTime.Now - _gameStartTime;
+    public DateTime GameStartTime { get; private set; } = DateTime.MinValue;
+
+    public TimeSpan ElapsedTime => DateTime.Now - GameStartTime;
     void Start()
     {
         InitializeBoard(BoardSize);
-        CurrentPlayer = _startingPlayer;
+        CurrentPlayer = StartingPlayer;
     }
 
     private void InitializeBoard(uint size)
@@ -60,27 +57,28 @@ class GameManager : Singleton<GameManager>
         {
             _board.SetCell((int)x, (int)y, (int)CurrentPlayer);
 
+            PlayerMoveCount++;
+
             OnCellPlayed?.Invoke((int)x, (int)y, CurrentPlayer);
 
-            if (IsGameOver())
+            bool isDraw;
+            if (HasGameStarted && IsGameOver(out isDraw))
             {
-                _gameEndTime = DateTime.Now;
-                // _gameDuration = _gameEndTime - _gameStartTime;
-                OnPlayerWon?.Invoke(CurrentPlayer);
-                OnGameEnded?.Invoke();
+                HasGameStarted = false;
+                GameStartTime = DateTime.MinValue;
+
+                OnGameEnded?.Invoke(isDraw ? Player.Invalid : CurrentPlayer);
             }
             else
             {
-                if(!_hasGameStarted)
+                if(!HasGameStarted)
                 {
-                    _hasGameStarted = true;
+                    HasGameStarted = true;
 
-                    _gameStartTime = DateTime.Now;
-                    OnGameStarted?.Invoke();
+                    GameStartTime = DateTime.Now;
                 }
 
                 CurrentPlayer = CurrentPlayer == Player.X ? Player.O : Player.X;
-                OnPlayerChanged?.Invoke(CurrentPlayer);
             }
         }
     }
@@ -95,21 +93,34 @@ class GameManager : Singleton<GameManager>
         return _board.GetCell(x, y) == (int)Player.Invalid;
     }
 
-    public bool IsGameOver()
+    public bool IsGameOver(out bool isDraw)
     {
-        return CheckWin(Player.X) || CheckWin(Player.O) || IsBoardFull();
+        isDraw = false;
+
+        if(CheckWin(Player.X) || CheckWin(Player.O))
+        {
+            return true;
+        }
+
+        if(IsBoardFull())
+        {
+            isDraw = true;
+            return true;
+        }
+
+        return false;
     }
 
     public void Reset()
     {
         InitializeBoard(BoardSize);
-        CurrentPlayer = _startingPlayer;
+        CurrentPlayer = StartingPlayer;
 
-        _hasGameStarted = false;
-        _gameStartTime = DateTime.MinValue;
+        HasGameStarted = false;
+        GameStartTime = DateTime.MinValue;
 
         OnGameReset?.Invoke();
-        OnPlayerChanged?.Invoke(CurrentPlayer);
+        // OnPlayerChanged?.Invoke(CurrentPlayer);
     }
 
     private bool CheckWin(Player player)

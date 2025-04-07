@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class Menu : MonoBehaviour
 {
@@ -10,6 +12,18 @@ public abstract class Menu : MonoBehaviour
     void OnValidate()
     {
         SceneReference?.OnValidate();
+    }
+
+    protected void AddButtonOnClickListener(Button button, Action callback)
+    {
+        if (button != null)
+        {
+            button.onClick.AddListener(() => callback());
+        }
+        else
+        {
+            Log.Warn($"Button {button.name} is not assigned in the inspector.");
+        }
     }
     public virtual void Show()
     {
