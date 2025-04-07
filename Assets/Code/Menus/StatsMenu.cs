@@ -7,19 +7,18 @@ public class StatsMenu : Menu
     [Header("Stats Menu Buttons")]
     [Tooltip("Button to go back")]
     [SerializeField]
-    public Button backButton;
+    private Button backButton;
 
     void Start()
     {
-        Debug.Log("StatsMenu Start");
-        if(backButton != null)
-        {
-            backButton.onClick.AddListener(OnBackButtonClicked);
-        }
+        AddOnClickListener(backButton, OnBackButtonClicked);
     }
 
     private void OnBackButtonClicked()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
+
         MenuManager.Instance.NavigateBack();
     }
 }

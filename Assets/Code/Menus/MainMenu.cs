@@ -22,10 +22,12 @@ public class MainMenu : Menu
 
     void Start()
     {
-        AddButtonOnClickListener(playButton, OnPlayButtonClicked);
-        AddButtonOnClickListener(statsButton, OnStatsButtonClicked);
-        AddButtonOnClickListener(settingsButton, OnSettingsButtonClicked);
-        AddButtonOnClickListener(exitButton, OnExitButtonClicked);
+        AddOnClickListener(playButton, OnPlayButtonClicked);
+        AddOnClickListener(statsButton, OnStatsButtonClicked);
+        AddOnClickListener(settingsButton, OnSettingsButtonClicked);
+        AddOnClickListener(exitButton, OnExitButtonClicked);
+
+        SoundManager.Instance.PlayMusic("music");
     }
 
     private void OnPlayButtonClicked()
@@ -42,14 +44,23 @@ public class MainMenu : Menu
     }
     private void OnStatsButtonClicked()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
+
         MenuManager.Instance.NavigateTo<StatsMenu>();
     }
     private void OnSettingsButtonClicked()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
+
         MenuManager.Instance.NavigateTo<SettingsMenu>();
     }
     private void OnExitButtonClicked()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
+
         DialogBox.Instance.Show("Are you sure you want to exit?", 
             () => {
     #if UNITY_EDITOR

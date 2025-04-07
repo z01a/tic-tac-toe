@@ -14,7 +14,7 @@ public abstract class Menu : MonoBehaviour
         SceneReference?.OnValidate();
     }
 
-    protected void AddButtonOnClickListener(Button button, Action callback)
+    protected void AddOnClickListener(Button button, Action callback)
     {
         if (button != null)
         {
@@ -23,6 +23,18 @@ public abstract class Menu : MonoBehaviour
         else
         {
             Log.Warn($"Button {button.name} is not assigned in the inspector.");
+        }
+    }
+
+    protected void AddOnValueChangedListener(Toggle toggle, Action<bool> callback)
+    {
+        if(toggle != null)
+        {
+            toggle.onValueChanged.AddListener((value) => callback(value));
+        }
+        else
+        {
+            Log.Warn($"Toggle {toggle.name} is not assigned in the inspector.");
         }
     }
     public virtual void Show()

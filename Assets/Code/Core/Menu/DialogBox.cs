@@ -43,18 +43,24 @@ public class DialogBox : Singleton<DialogBox>
 
     private void OnOkPressed()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
         _onOk?.Invoke();
         Close();
     }
 
     private void OnCancelPressed()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
         _onCancel?.Invoke();
         Close();
     }
 
     private void Close()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click1");
         gameObject.SetActive(false);
     }
 }

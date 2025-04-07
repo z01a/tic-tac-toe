@@ -35,9 +35,11 @@ public class GameMenu : Menu
         GameManager.Instance.OnCellPlayed += OnCellPlayed;
         GameManager.Instance.OnGameReset += OnGameReset;
 
-        AddButtonOnClickListener(backButton, OnBackButtonClicked);
+        AddOnClickListener(backButton, OnBackButtonClicked);
 
         InitializeBoard();
+
+        SoundManager.Instance.PlaySFX("woosh");
     }
 
     private void OnGameEnded(Player player)
@@ -165,6 +167,9 @@ public class GameMenu : Menu
 
     private void OnCellPlayed(int x, int y, Player player)
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click1");
+
         Log.Info($"Cell played at ({x}, {y})");
         
         if (_buttonGrid[x, y] != null)
@@ -186,6 +191,9 @@ public class GameMenu : Menu
 
     private void OnBackButtonClicked()
     {
+        // TODO: This should be moves somewhere else
+        SoundManager.Instance.PlaySFX("click2");
+
         MenuManager.Instance.NavigateBack();
     }
 }

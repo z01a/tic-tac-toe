@@ -1148,9 +1148,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f765a9ca38094247829e017b2378229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneToLoad: {fileID: 102900000, guid: 9015de241686746b09582377d43c6de2, type: 3}
-  SceneToLoadName: PlayScene
+  SceneReference:
+    sceneAsset: {fileID: 0}
+    SceneName: 
   backButton: {fileID: 7900748425565172838}
+  toggleMusic: {fileID: 4535700171786803051}
+  toggleSfx: {fileID: 328106243899744330}
 --- !u!1 &9072977109929323290
 GameObject:
   m_ObjectHideFlags: 0

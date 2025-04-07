@@ -116,11 +116,12 @@ class GameManager : Singleton<GameManager>
         InitializeBoard(BoardSize);
         CurrentPlayer = StartingPlayer;
 
+        PlayerMoveCount = 0;
+
         HasGameStarted = false;
         GameStartTime = DateTime.MinValue;
 
         OnGameReset?.Invoke();
-        // OnPlayerChanged?.Invoke(CurrentPlayer);
     }
 
     private bool CheckWin(Player player)
